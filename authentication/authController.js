@@ -1,58 +1,47 @@
 const User = require('../models/userModel');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const { generateToken } = require('./authService');
 
-
-require('dotenv').config();
-
-
-const generateToken = (user) => {
-  return jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: '24h',
-  });
-};
-
-// register
+// User Register
 exports.register = async (req, res) => {
-  console.log(req.body);
   const { name, email, password } = req.body;
-  
+
   try {
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ msg: 'Utilisateur déjà enregistré' });
+      return res.status(400).json({ msg: 'User Already exists' });
     }
 
     user = new User({ name, email, password });
     await user.save();
-    
+    console.log('User registered successfully');
+
     const token = generateToken(user);
     res.status(201).json({ token });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Erreur serveur');
+    res.status(500).send('Server Error');
   }
 };
 
-// Connexion
+// User Login
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-  
+
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ msg: 'Utilisateur non trouvé' });
+      return res.status(400).json({ msg: 'User not found while login' });
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(400).json({ msg: 'Mot de passe incorrect' });
+      return res.status(400).json({ msg: 'wrong password while login' });
     }
 
     const token = generateToken(user);
     res.json({ token });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Erreur serveur');
+    res.status(500).send('server error while login'); 
   }
 };
