@@ -3,6 +3,7 @@ const { generateToken } = require('./authService');
 
 // User Register
 exports.register = async (req, res) => {
+  console.log('registering user');
   const { name, email, password } = req.body;
 
   try {

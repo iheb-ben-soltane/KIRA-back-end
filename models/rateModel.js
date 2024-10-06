@@ -1,4 +1,5 @@
 const rateSchema = new mongoose.Schema({
+    writer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     comment: { type: String },
     stars: { type: Number, min: 1, max: 5 },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
