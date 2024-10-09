@@ -3,9 +3,17 @@ const bcrypt = require('bcryptjs');
 
 
 const UserSchema = new mongoose.Schema({
-    name: {
+    firstName: {
       type: String,
-      required: true,
+      required: true 
+    },
+    lastName: {
+      type: String,
+      required: true 
+    },
+    phoneNumber: {
+      type: String,
+      required: true 
     },
     email: {
       type: String,
@@ -16,7 +24,22 @@ const UserSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-  });
+    about: {
+      type: String 
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
+    location: {
+      type: String,
+    },
+    ProfilePicture: {
+      type: String,
+      default: 'default.jpg', // lezem n7adhro default.jpg 
+    },
+});
 
   
 // Hash password before saving
