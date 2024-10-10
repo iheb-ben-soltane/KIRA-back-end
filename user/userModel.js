@@ -9,13 +9,15 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     about: { type: String },
     isVerified: { type: Boolean, default: false },
+    location: { type: String, default: "" },
+    photo: { type: String, default: "" },
 });
 
 
 
   
 // Hash password before saving
-UserSchema.pre('save', async function (next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();
   }
@@ -24,10 +26,10 @@ UserSchema.pre('save', async function (next) {
 });
 
 // Compare passwords when login
-UserSchema.methods.matchPassword = async function (enteredPassword) {
+userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;
