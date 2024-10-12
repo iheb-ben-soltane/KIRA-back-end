@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../user/userModel');
+const { uploadBlob,getPhotoByBlobURL } = require('../helpers/azureBlobService');
 
 
 // Get all users
@@ -20,72 +21,72 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 
-// const getUsers = asyncHandler(async (req, res) => {
-//   const users = await User.find({});
-//   res.json(users);
-// });
+// Add a photo to a user
+const addPhotoToUser = asyncHandler(async (req, res) => {
+
+  const userId = req.user.id; //from the jwt
+  const photo = req.file.buffer; // get the file from the request
+
+  // Check if there's a file
+  if (!req.file) {
+    res.status(400);
+    throw new Error('No file uploaded');
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  const blobURL = await uploadBlob(photo); // Upload the photo to Azure Blob Storage
+
+  user.photo = blobURL;
+  await user.save();
+
+  res.status(200).json({
+    message: 'Photo added successfully',
+  });
+
+});
 
 
-// const getUserProfile = asyncHandler(async (req, res) => {
-//   const user = await User.findById(req.user._id);
 
-//   if (user) {
-//     res.json({
-//       _id: user._id,
-//       firstName: user.firstName,
-//       lastName: user.lastName,
-//       phoneNumber: user.phoneNumber,
-//       email: user.email,
-//       about: user.about,
-//       rate: user.rate,
-//       isVerified: user.isVerified,
-//     });
-//   } else {
-//     res.status(404);
-//     throw new Error('User not found');
+// const getPhotoFromUser = async (blobURL) => {
+//   try {
+//     // Download the photo blob from Azure Blob Storage
+//     const photoStream = await downloadBlob(blobURL);
+//     return photoStream;
+//   } catch (error) {
+//     throw new Error("Failed to get photo from user");
 //   }
-// });
+// };
 
 
-// const updateUserProfile = asyncHandler(async (req, res) => {
-//   const user = await User.findById(req.user._id);
+// Controller to get the photo of the current user
+const getPhotoFromUser = asyncHandler(async (req, res) => {
+  const userId = req.params.id; 
+  const user = await User.findById(userId); // Retrieve the user from the database
 
-//   if (user) {
-//     user.firstName = req.body.firstName || user.firstName;
-//     user.lastName = req.body.lastName || user.lastName;
-//     user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
-//     user.email = req.body.email || user.email;
-//     user.about = req.body.about || user.about;
-//     user.rate = req.body.rate || user.rate;
+  if (!user || !user.photo) {
+    res.status(404).json({ message: 'Photo not found' });
+    return;
+  }
 
-//     if (req.body.password) {
-//       user.password = req.body.password;
-//     }
+  // Use the global function to get the photo stream from Azure Blob Storage
+  const photoStream = await getPhotoByBlobURL(user.photo);
 
-//     const updatedUser = await user.save();
+  // we must set the correct content type before sending the image
+  // res.setHeader('Content-Type', 'image/jpeg'); // Adjust this based on the actual file type
 
-//     res.json({
-//       _id: updatedUser._id,
-//       firstName: updatedUser.firstName,
-//       lastName: updatedUser.lastName,
-//       phoneNumber: updatedUser.phoneNumber,
-//       email: updatedUser.email,
-//       about: updatedUser.about,
-//       rate: updatedUser.rate,
-//       isVerified: updatedUser.isVerified,
-//     });
-//   } else {
-//     res.status(404);
-//     throw new Error('User not found');
-//   }
-// });
-
+  // Pipe the photo stream directly to the response
+  photoStream.pipe(res);
+});
 
 
 module.exports = {
-  // getUserProfile,
-  // updateUserProfile,
-  // getUsers,
   getAllUsers,
-  getUserById
+  getUserById,
+  addPhotoToUser,
+  getPhotoFromUser
 };

@@ -1,13 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Operation = require('../operation/operationModel');
 
-// // Get all operations
-// const getOperations = asyncHandler(async (req, res) => {
-//   const operations = await Operation.find({});
-//   res.json(operations);
-// });
-
-
 // Get operation by ID
 const getOperationById = asyncHandler(async (req, res) => {
   const { id } = req.params;
