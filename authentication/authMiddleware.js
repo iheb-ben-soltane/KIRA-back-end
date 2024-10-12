@@ -3,7 +3,8 @@ require('dotenv').config();
 
 // Middleware pour vérifier le token
 exports.verifyToken = (req, res, next) => {
-  const token = req.header('Authorization');
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
   if (!token) {
     return res.status(401).json({ msg: 'No token given, access denied' });
   }
