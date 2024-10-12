@@ -1,8 +1,9 @@
 const express = require('express');
-const { getOperations, createOperation } = require('../controllers/operationController');
-const { protect } = require('../middleware/authMiddleware');
+const { createOperation,getOperationById } = require('../operation/operationController');
 const router = express.Router();
+const { verifyToken } = require('../authentication/authMiddleware');
 
-router.route('/').get(protect, getOperations).post(protect, createOperation); // Get all operations, create operation
-
+// no need here for the verifyToken cause we it will be automatically created after the acceptance of the request
+router.post('/operations/create', createOperation);
+router.get('/operations/:id', getOperationById);
 module.exports = router;

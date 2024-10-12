@@ -1,9 +1,13 @@
+
+const mongoose = require('mongoose');
+
+
 const rateSchema = new mongoose.Schema({
     writer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    comment: { type: String },
+    content: { type: String },
     stars: { type: Number, min: 1, max: 5 },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
+    targetUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    targetProduct: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
 });
 
 const Rate = mongoose.model('Rate', rateSchema);

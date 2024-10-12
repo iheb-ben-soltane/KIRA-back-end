@@ -1,8 +1,10 @@
 const express = require('express');
-const { getCommunities, createCommunity } = require('../controllers/communityController');
-const { protect } = require('../middleware/authMiddleware');
+const { createCommunity, getCommunityById,getCommunities } = require('../community/communityController');
 const router = express.Router();
+const { verifyToken } = require('../authentication/authMiddleware');
 
-router.route('/').get(getCommunities).post(protect, createCommunity); // Get all communities, create community
+router.post('/communities/create', verifyToken, createCommunity);
+router.get('/communities/:id', verifyToken, getCommunityById);
+router.get('/communities',getCommunities);
 
 module.exports = router;
