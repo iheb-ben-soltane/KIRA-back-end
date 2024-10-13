@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getAllUsers,getUserById,addPhotoToUser,getPhotoFromUser } = require('./userController');
-const upload = require('../config/multerConfig');
+const upload = require('../../config/multerConfig');
 const { verifyToken } = require('../authentication/authMiddleware');
 
 router.get('/users', getAllUsers);
