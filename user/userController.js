@@ -63,7 +63,7 @@ const addPhotoToUser = asyncHandler(async (req, res) => {
 // };
 
 
-// Controller to get the photo of the current user
+// get the photo of a user
 const getPhotoFromUser = asyncHandler(async (req, res) => {
   const userId = req.params.id; 
   const user = await User.findById(userId); // Retrieve the user from the database
@@ -73,13 +73,12 @@ const getPhotoFromUser = asyncHandler(async (req, res) => {
     return;
   }
 
-  // Use the global function to get the photo stream from Azure Blob Storage
   const photoStream = await getPhotoByBlobURL(user.photo);
 
   // we must set the correct content type before sending the image
   // res.setHeader('Content-Type', 'image/jpeg'); // Adjust this based on the actual file type
 
-  // Pipe the photo stream directly to the response
+  // pipe the photo directly to the response
   photoStream.pipe(res);
 });
 

@@ -39,7 +39,6 @@ const getPhotoByBlobURL = async (blobURL) => {
 
 
 
-//raby ysahal fi deleteBlob
 // async function deleteBlob(containerName, blobName) {
 //   try {
 //     const containerClient = blobServiceClient.getContainerClient(containerName);
@@ -58,6 +57,6 @@ const getPhotoByBlobURL = async (blobURL) => {
 module.exports = {
   uploadBlob,
   downloadBlob,
-//   deleteBlob,
+  // deleteBlob,
   getPhotoByBlobURL
 };
