@@ -3,7 +3,8 @@ require('dotenv').config();
 
 // Middleware pour vérifier le token
 exports.verifyToken = (req, res, next) => {
-  const token = req.header('Authorization');
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
   if (!token) {
     return res.status(401).json({ messageKey: 'error.token_missing' });
   }
@@ -13,6 +14,7 @@ exports.verifyToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
+    console.error(err.message);
     res.status(401).json({ messageKey: 'error.invalid_token' });
   }
 };
