@@ -6,7 +6,7 @@ const { URL } = require("url");
 
 async function uploadBlob(readableStream) {
     const blobName = uuidv1(); // unique name for the blob
-    const containerClient = blobServiceClient.getContainerClient(containerName); 
+    const containerClient = blobServiceClient.getContainerClient(containerName+ "/hatem"); 
     const blockBlobClient = containerClient.getBlockBlobClient(blobName); 
     await blockBlobClient.uploadData(readableStream);
   

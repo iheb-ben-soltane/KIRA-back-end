@@ -2,7 +2,7 @@ const express = require('express');
 const { getProducts, getProductById, createProduct,addPhotosToProduct } = require('../product/productController');
 const router = express.Router();
 const { verifyToken } = require('../authentication/authMiddleware');
-const upload = require('../config/multerConfig');
+const upload = require('../../config/multerConfig');
 
 router.get('/products', getProducts);
 router.get('/products/:id', getProductById);
