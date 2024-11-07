@@ -34,7 +34,7 @@ const getUserById = asyncHandler(async (req, res, next) => {
 const addPhotoToUser = asyncHandler(async (req, res, next) => {
   const userId = req.user.id; // from the JWT
   const photo = req.file?.buffer; // get the file from the request
-
+ 
   try {
     // Check if there's a file
     if (!req.file) {
@@ -47,8 +47,8 @@ const addPhotoToUser = asyncHandler(async (req, res, next) => {
       res.status(404);
       return next({ messageKey: 'error.user_not_found' });
     }
-
-    const blobURL = await uploadBlob(photo); // Upload the photo to Azure Blob Storage
+    console.log("user email",user.email);
+    const blobURL = await uploadBlob(photo,user.email); // Upload the photo to Azure Blob Storage
 
     user.photo = blobURL;
     await user.save();
@@ -74,7 +74,7 @@ const getPhotoFromUser = asyncHandler(async (req, res, next) => {
       return next({ messageKey: 'error.photo_not_found' });
     }
 
-    const photoStream = await getPhotoByBlobURL(user.photo);
+    const photoStream = await getPhotoByBlobURL(user.photo,user.email); // Get the photo from Azure Blob Storage
 
     // Pipe the photo directly to the response
     photoStream.pipe(res);

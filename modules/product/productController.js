@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../product/productModel');
 const Category = require('../category/categoryModel');
-const { uploadBlob } = require('../../helpers/azureBlobService');
+const { uploadBlob,getPhotoByBlobURL } = require('../../helpers/azureBlobService');
 
 // Get all products
 const getProducts = asyncHandler(async (req, res, next) => {
@@ -44,7 +44,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
     // Assign the owner ID from the JWT token
     const owner = req.user.id;
 
-    const product = new Product({ name, images, description, sellOrRent, price, reservedDays, category, owner });
+    const product = new Product({ name, images, description, sellOrRent, price, reservedDays, category, owner });// ??????
     await product.save();
 
     res.status(201).json(product);
@@ -73,6 +73,12 @@ const addPhotosToProduct = asyncHandler(async (req, res, next) => {
       return next({ messageKey: 'error.not_authorized' });
     }
 
+    // Check if images are provided
+    if (!images || images.length === 0) {
+      res.status(400);
+      return next({ messageKey: 'error.no_images_provided' });
+    }
+
     // Check if adding the new images exceeds the 10 image limit
     if (product.images.length + images.length > 10) {
       res.status(400);
@@ -80,10 +86,11 @@ const addPhotosToProduct = asyncHandler(async (req, res, next) => {
     }
 
     const imageUrls = [];
-
+    await product.populate('owner');// the ownerIdd is replaced by the owner object
     for (const image of images) {
-      const blobURL = await uploadBlob(image.buffer); // upload to Azure
-      imageUrls.push(blobURL); 
+      const blobURL = await uploadBlob(image.buffer,product.owner.email); // upload to Azure
+      const lastPart = blobURL.substring(blobURL.lastIndexOf('/') + 1);
+      imageUrls.push(lastPart); 
     }
 
     product.images.push(...imageUrls);
@@ -101,9 +108,38 @@ const addPhotosToProduct = asyncHandler(async (req, res, next) => {
   }
 });
 
+// Get the photo of a product
+const getProductPhoto = asyncHandler(async (req, res, next) => {
+  const productId = req.params.id;
+  const imageIndex = req.params.index;
+
+  try {
+    const product = await Product.findById(productId).populate('owner');
+
+    if (!product || !product.images || product.images.length === 0) {
+      res.status(404);
+      return next({ messageKey: 'error.photo_not_found' });
+    }
+
+    if (!product.owner || !product.owner.email) {
+      res.status(404);
+      return next({ messageKey: 'error.owner_email_not_found' });
+    }
+
+    const photoStream = await getPhotoByBlobURL(product.images[imageIndex], product.owner.email);
+
+    photoStream.pipe(res);
+  } catch (err) {
+    console.error(err.message);
+    next({ messageKey: 'error.internal_server' });
+  }
+});
+
+
 module.exports = {
   getProducts,
   getProductById,
   createProduct,
   addPhotosToProduct,
+  getProductPhoto,
 };
