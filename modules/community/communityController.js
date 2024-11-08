@@ -18,7 +18,7 @@ const getCommunityById = asyncHandler(async (req, res, next) => {
   try {
     const community = await Community.findById(id);
     if (!community) {
-      res.status(404);
+      ;
       return next({ messageKey: 'error.community_not_found' });
     }
     res.status(200).json(community);

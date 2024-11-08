@@ -6,7 +6,7 @@ exports.verifyToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (!token) {
-    return res.status(401).json({ messageKey: 'error.token_missing' });
+    next({ messageKey: 'error.token_missing' });
   }
 
   try {
@@ -15,6 +15,6 @@ exports.verifyToken = (req, res, next) => {
     next();
   } catch (err) {
     console.error(err.message);
-    res.status(401).json({ messageKey: 'error.invalid_token' });
+    next({ messageKey: 'error.invalid_token' });
   }
 };

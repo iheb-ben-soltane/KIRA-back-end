@@ -9,7 +9,7 @@ exports.register = async (req, res, next) => {
   try {
     let user = await User.findOne({ email });
     if (user) {
-      res.status(400);
+      ;
       return next({ messageKey: 'error.user_exists' });
     }
 
@@ -33,13 +33,13 @@ exports.login = async (req, res, next) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      res.status(400);
+      ;
       return next({ messageKey: 'error.user_not_found' });
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      res.status(400);
+      ;
       return next({ messageKey: 'error.wrong_password' });
     }
 
@@ -47,7 +47,6 @@ exports.login = async (req, res, next) => {
     res.json({ token });
     console.log('User logged in successfully');
   } catch (err) {
-    res.status(500);
     console.error(err.message);
     next({ messageKey: 'error.internal_server' });
   }

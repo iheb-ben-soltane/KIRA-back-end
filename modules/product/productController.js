@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler');
 const Product = require('../product/productModel');
 const Category = require('../category/categoryModel');
 const { uploadBlob,getPhotoByBlobURL } = require('../../helpers/azureBlobService');
-
+const { resizeImageIfNeeded } = require('../../helpers/resizeImage');
 // Get all products
 const getProducts = asyncHandler(async (req, res, next) => {
   try {
@@ -19,7 +19,7 @@ const getProductById = asyncHandler(async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
-      res.status(404);
+      ;
       return next({ messageKey: 'error.product_not_found' });
     }
     res.json(product);
@@ -37,7 +37,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
     // Check if category exists
     const existingCategory = await Category.findById(category);
     if (!existingCategory) {
-      res.status(400);
+      ;
       return next({ messageKey: 'error.invalid_category' });
     }
 
@@ -54,6 +54,9 @@ const createProduct = asyncHandler(async (req, res, next) => {
   }
 });
 
+
+
+
 // Add photos to a product
 const addPhotosToProduct = asyncHandler(async (req, res, next) => {
   const productId = req.params.id; 
@@ -63,32 +66,37 @@ const addPhotosToProduct = asyncHandler(async (req, res, next) => {
   try {
     const product = await Product.findById(productId);
     if (!product) {
-      res.status(404);
+      ;
       return next({ messageKey: 'error.product_not_found' });
     }
 
     // Verify if the user is the owner of the product
     if (product.owner.toString() !== userId) {
-      res.status(403);
+      ;
       return next({ messageKey: 'error.not_authorized' });
     }
 
     // Check if images are provided
     if (!images || images.length === 0) {
-      res.status(400);
+      ;
       return next({ messageKey: 'error.no_images_provided' });
     }
 
     // Check if adding the new images exceeds the 10 image limit
     if (product.images.length + images.length > 10) {
-      res.status(400);
+      ;
       return next({ messageKey: 'error.max_images_exceeded' });
     }
 
     const imageUrls = [];
     await product.populate('owner');// the ownerIdd is replaced by the owner object
     for (const image of images) {
-      const blobURL = await uploadBlob(image.buffer,product.owner.email); // upload to Azure
+      let imageBuffer = image.buffer;
+      
+      // Resize image if it exceeds 1MB
+      imageBuffer = await resizeImageIfNeeded(imageBuffer);
+      
+      const blobURL = await uploadBlob(imageBuffer, product.owner.email); // upload to Azure
       const lastPart = blobURL.substring(blobURL.lastIndexOf('/') + 1);
       imageUrls.push(lastPart); 
     }
@@ -115,14 +123,12 @@ const getProductPhoto = asyncHandler(async (req, res, next) => {
 
   try {
     const product = await Product.findById(productId).populate('owner');
-
-    if (!product || !product.images || product.images.length === 0) {
-      res.status(404);
+    if (!product || !product.images || product.images.length<=imageIndex) {
       return next({ messageKey: 'error.photo_not_found' });
     }
 
     if (!product.owner || !product.owner.email) {
-      res.status(404);
+      ;
       return next({ messageKey: 'error.owner_email_not_found' });
     }
 

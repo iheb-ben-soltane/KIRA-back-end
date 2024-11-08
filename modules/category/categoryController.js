@@ -18,7 +18,7 @@ const getCategoryById = asyncHandler(async (req, res, next) => {
   try {
     const category = await Category.findById(id);
     if (!category) {
-      res.status(404);
+      ;
       return next({ messageKey: 'error.category_not_found' });
     }
     res.status(200).json(category);

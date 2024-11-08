@@ -7,7 +7,7 @@ const getOperationById = asyncHandler(async (req, res, next) => {
   try {
     const operation = await Operation.findById(id);
     if (!operation) {
-      res.status(404);
+      ;
       return next({ messageKey: 'error.operation_not_found' });
     }
     res.status(200).json(operation);
@@ -23,7 +23,7 @@ const createOperation = asyncHandler(async (req, res, next) => {
 
   // Validate fields
   if (!owner || !buyerOrRenter || !product || !type || !totalAmount) {
-    res.status(400);
+    ;
     return next({ messageKey: 'error.fields_required' });
   }
 

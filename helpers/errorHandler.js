@@ -1,12 +1,30 @@
-const errorHandler = (err, req, res, next) => {
-    console.error(err.stack);// to handle
-  
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    res.status(statusCode).json({
-      success: false,
-      messageKey: err.messageKey || 'error.internal_server', // Envoi de la clé de message
-    });
+// const errorMessages = require('./errorMessages').errors;
+
+// const errorHandler = (err, req, res, next) => {
+ 
+//   const messageKey = err.messageKey || 'error.internal_server';
+//   const status = errorMessages[messageKey]?.httpStatus || 500;
+
+//   res.status(status).json({ messageKey });
     
-  };
+//   };
   
-  module.exports = errorHandler;
+//   module.exports = errorHandler; 500 
+
+const errorMessages = require('./errorMessages').errors;
+
+const errorHandler = (err, req, res, next) => {
+  const messageKey = err.messageKey || 'error.internal_server';
+  console.log(err);
+  const errorResponse = errorMessages[messageKey] || {
+    httpStatus: 500,
+    translations: {
+      en: 'Internal server error',
+      fr: 'Erreur interne du serveur'
+    }
+  };
+
+  res.status(errorResponse.httpStatus).json(errorResponse);
+};
+
+module.exports = errorHandler;

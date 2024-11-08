@@ -19,7 +19,7 @@ const getRateById = asyncHandler(async (req, res, next) => {
   try {
     const rate = await Rate.findById(req.params.id);
     if (!rate) {
-      res.status(404);
+      ;
       return next({ messageKey: 'error.rate_not_found' });
     }
     res.json(rate);
@@ -38,7 +38,7 @@ const createRate = asyncHandler(async (req, res, next) => {
     if (targetProduct) {
       const existingProduct = await Product.findById(targetProduct);
       if (!existingProduct) {
-        res.status(400);
+        ;
         return next({ messageKey: 'error.invalid_product_id' });
       }
     }
@@ -47,7 +47,7 @@ const createRate = asyncHandler(async (req, res, next) => {
     if (targetUser) {
       const existingUser = await User.findById(targetUser);
       if (!existingUser) {
-        res.status(400);
+        ;
         return next({ messageKey: 'error.invalid_user_id' });
       }
     }

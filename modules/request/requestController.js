@@ -9,7 +9,7 @@ const getRequestById = asyncHandler(async (req, res, next) => {
   try {
     const request = await Request.findById(id);
     if (!request) {
-      res.status(404);
+      ;
       return next({ messageKey: 'error.request_not_found' });
     }
     res.status(200).json(request);
@@ -30,14 +30,14 @@ const createRequest = asyncHandler(async (req, res, next) => {
     // Check if the product exists
     const existingProduct = await Product.findById(product);
     if (!existingProduct) {
-      res.status(400);
+      ;
       return next({ messageKey: 'error.invalid_product_id' });
     }
 
     // Check if the receiver exists
     const existingReceiver = await User.findById(receiver);
     if (!existingReceiver) {
-      res.status(400);
+      ;
       return next({ messageKey: 'error.invalid_receiver_id' });
     }
 
