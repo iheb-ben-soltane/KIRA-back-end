@@ -3,6 +3,7 @@ const Product = require('../product/productModel');
 const Category = require('../category/categoryModel');
 const { uploadBlob,getPhotoByBlobURL } = require('../../helpers/azureBlobService');
 const { resizeImageIfNeeded } = require('../../helpers/resizeImage');
+
 // Get all products
 const getProducts = asyncHandler(async (req, res, next) => {
   try {
@@ -70,13 +71,12 @@ const addPhotosToProduct = asyncHandler(async (req, res, next) => {
       return next({ messageKey: 'error.product_not_found' });
     }
 
-    // Verify if the user is the owner of the product
+    // verify if the user is the owner of the product
     if (product.owner.toString() !== userId) {
       ;
       return next({ messageKey: 'error.not_authorized' });
     }
 
-    // Check if images are provided
     if (!images || images.length === 0) {
       ;
       return next({ messageKey: 'error.no_images_provided' });
@@ -89,11 +89,10 @@ const addPhotosToProduct = asyncHandler(async (req, res, next) => {
     }
 
     const imageUrls = [];
-    await product.populate('owner');// the ownerIdd is replaced by the owner object
+    await product.populate('owner');
     for (const image of images) {
       let imageBuffer = image.buffer;
       
-      // Resize image if it exceeds 1MB
       imageBuffer = await resizeImageIfNeeded(imageBuffer);
       
       const blobURL = await uploadBlob(imageBuffer, product.owner.email); // upload to Azure
@@ -105,11 +104,11 @@ const addPhotosToProduct = asyncHandler(async (req, res, next) => {
 
     await product.save();
 
-    // Return a success message and array of images
     res.status(200).json({
       message: 'Photos added successfully',
       images: product.images,
     });
+    
   } catch (err) {
     console.error(err.message);
     next({ messageKey: 'error.internal_server' });

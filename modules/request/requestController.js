@@ -24,17 +24,14 @@ const createRequest = asyncHandler(async (req, res, next) => {
   const { receiver, product, type, requestedDays } = req.body;
 
   try {
-    // Assign the sender ID from the JWT token
     const sender = req.user.id;
 
-    // Check if the product exists
     const existingProduct = await Product.findById(product);
     if (!existingProduct) {
       ;
       return next({ messageKey: 'error.invalid_product_id' });
     }
 
-    // Check if the receiver exists
     const existingReceiver = await User.findById(receiver);
     if (!existingReceiver) {
       ;

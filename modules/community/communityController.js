@@ -32,7 +32,6 @@ const getCommunityById = asyncHandler(async (req, res, next) => {
 const createCommunity = asyncHandler(async (req, res, next) => {
   const { name, isPublic } = req.body;
   try {
-    // Get the creator ID from the JWT token to assign it to the members and admins
     const creator = req.user.id;
     const community = new Community({
       name,

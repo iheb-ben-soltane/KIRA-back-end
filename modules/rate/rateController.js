@@ -34,7 +34,6 @@ const createRate = asyncHandler(async (req, res, next) => {
   const { content, stars, targetUser, targetProduct } = req.body;
 
   try {
-    // Check if the target product exists
     if (targetProduct) {
       const existingProduct = await Product.findById(targetProduct);
       if (!existingProduct) {
@@ -43,7 +42,6 @@ const createRate = asyncHandler(async (req, res, next) => {
       }
     }
 
-    // Check if the target user exists
     if (targetUser) {
       const existingUser = await User.findById(targetUser);
       if (!existingUser) {
@@ -52,7 +50,6 @@ const createRate = asyncHandler(async (req, res, next) => {
       }
     }
 
-    // Assign the writer ID from the JWT token
     const writer = req.user.id;
 
     const rate = new Rate({ writer, content, stars, targetUser, targetProduct });

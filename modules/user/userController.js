@@ -23,7 +23,7 @@ const getUserById = asyncHandler(async (req, res, next) => {
       ;
       return next({ messageKey: 'error.user_not_found' });
     }
-    res.status(200).json(user); // Return the user
+    res.status(200).json(user); 
   } catch (err) {
     console.error(err.message);
     next({ messageKey: 'error.internal_server' });
@@ -67,16 +67,16 @@ const getPhotoFromUser = asyncHandler(async (req, res, next) => {
   const userId = req.params.id;
 
   try {
-    const user = await User.findById(userId); // Retrieve the user from the database
+    const user = await User.findById(userId); 
 
     if (!user || !user.photo) {
       ;
       return next({ messageKey: 'error.photo_not_found' });
     }
 
-    const photoStream = await getPhotoByBlobURL(user.photo,user.email); // Get the photo from Azure Blob Storage
+    const photoStream = await getPhotoByBlobURL(user.photo,user.email); 
 
-    // Pipe the photo directly to the response
+    // pipe the photo directly to the response
     photoStream.pipe(res);
   } catch (err) {
     console.error(err.message);

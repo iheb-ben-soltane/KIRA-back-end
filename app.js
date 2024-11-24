@@ -12,10 +12,8 @@ const operationRoutes = require('./modules/operation/operationRoutes');
 const app = express();
 
 
-// Middleware pour parser les requêtes JSON
 app.use(express.json());
 
-// Routes
 app.use('/api/auth',rateLimiter, authRoutes);
 app.use('/api/users',rateLimiter, userRoutes);
 app.use('/api/categories',rateLimiter, categoryRoutes);
@@ -24,6 +22,6 @@ app.use('/api/requests',rateLimiter, requestRoutes);
 app.use('/api/rates',rateLimiter, rateRoutes);
 app.use('/api/communities',rateLimiter, communityRoutes);
 app.use('/api/operations',rateLimiter, operationRoutes);
-app.all('*', (req, res, next) => {next({messageKey: `error.not_found`});});app.all('*', (req, res, next) => {next({messageKey: `error.not_found`});});
+app.all('*', (req, res, next) => {next({messageKey: `error.not_found`});});
 app.use(errorHandler);
 module.exports = app;

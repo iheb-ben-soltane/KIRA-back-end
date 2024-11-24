@@ -21,7 +21,6 @@ const getOperationById = asyncHandler(async (req, res, next) => {
 const createOperation = asyncHandler(async (req, res, next) => {
   const { owner, buyerOrRenter, product, type, totalAmount, requestedDays } = req.body;
 
-  // Validate fields
   if (!owner || !buyerOrRenter || !product || !type || !totalAmount) {
     ;
     return next({ messageKey: 'error.fields_required' });
